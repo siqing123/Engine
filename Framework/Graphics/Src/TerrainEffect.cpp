@@ -1,0 +1,182 @@
+#include "Precompiled.h"
+#include "TerrainEffect.h"
+#include "Camera.h"
+#include "RenderObject.h"
+#include "VertexTypes.h"
+#include "AnimationUtil.h"
+#include "Animator.h"
+
+using namespace Storm;
+using namespace Storm::Graphics;
+
+void TerrainEffect::Initialize()
+{
+	mVertexShader.Initialize<Vertex>("../../Assets/Shaders/Terrain.fx");
+	mPixelShader.Initialize("../../Assets/Shaders/Terrain.fx");
+
+	mTransformBuffer.Initialize();
+	//mBoneTransformBuffer.Initialize();
+	mLightBuffer.Initialize();
+	mMaterialBuffer.Initialize();
+	mSettingsBuffer.Initialize();
+
+	mSampler.Initialize(Sampler::Filter::Linear, Sampler::AddressMode::Wrap);
+}
+
+void TerrainEffect::Terminate()
+{
+	mSampler.Terminate();
+	mSettingsBuffer.Terminate();
+	mMaterialBuffer.Terminate();
+	mLightBuffer.Terminate();
+	//mBoneTransformBuffer.Terminate();
+	mTransformBuffer.Terminate();
+
+	mPixelShader.Terminate();
+	mVertexShader.Terminate();
+}
+
+void TerrainEffect::Begin()
+{
+	mVertexShader.Bind();
+	mPixelShader.Bind();
+
+	mTransformBuffer.BindVS(0);
+
+	//mBoneTransformBuffer.BindVS(1);
+
+	mLightBuffer.BindVS(1);
+	mLightBuffer.BindPS(1);
+
+	//mLightBuffer.BindVS(2);
+	//mLightBuffer.BindPS(2);
+
+	//mMaterialBuffer.BindVS(3);
+	//mMaterialBuffer.BindPS(3);
+	mMaterialBuffer.BindPS(2);
+
+	//mSettingsBuffer.BindPS(4);
+	//mSettingsBuffer.BindVS(4);
+
+	mSettingsBuffer.BindPS(3);
+	mSettingsBuffer.BindVS(3);
+
+	mSampler.BindVS(0);
+	mSampler.BindPS(0);
+}
+
+void TerrainEffect::End()
+{
+	if (mShadowMap != nullptr)
+	{
+		//Texture::UnbindPS(4);
+		Texture::UnbindPS(2);
+	}
+
+}
+
+void TerrainEffect::Render(const RenderObject& renderObject)
+{
+	ASSERT(mCamera != nullptr, "StandardEffect -- no camera set!");
+	ASSERT(mDirectionalLight != nullptr, "StandardEffect -- no light set!");
+	Math::Matrix4 world = renderObject.transform.GetMatrix4();
+	Math::Matrix4 view = mCamera->GetViewMatrix();
+	Math::Matrix4 proj = mCamera->GetProjectionMatrix();
+
+	TransformData transformData;
+	transformData.world = Math::Transpose(world);
+	transformData.wvp[0] = Math::Transpose(world * view * proj);
+	if (mUseShadowMap && mLightCamera != nullptr)
+	{
+		view = mLightCamera->GetViewMatrix();
+		proj = mLightCamera->GetProjectionMatrix();
+		transformData.wvp[1] = Math::Transpose(world * view * proj);
+	}
+	transformData.viewPosition = mCamera->GetPosition();
+
+	SettingsData settingsData;
+	//settingsData.useSpecularMap = (mUseSpecularFlag && renderObject.specularMap.GetRawData()) ? 1 : 0;
+	//settingsData.useDisplacementMap = (mUseDisplacementFlag && renderObject.displacementMap.GetRawData()) ? 1 : 0;
+	//settingsData.useNormalMap = (mUseNorFlag && renderObject.normalMap.GetRawData()) ? 1 : 0;
+	//settingsData.displacementWeight = Math::Clamp(mDisplacementWeight, 0.0f, 1.0f);
+	if (mUseShadowMap && mShadowMap != nullptr)
+	{
+		//mShadowMap->BindPS(4);
+		mShadowMap->BindPS(2);
+		settingsData.useShadowMap = 1;
+		settingsData.depthBias = mDepthBias;
+	}
+
+	/*if (renderObject.animator)
+	{
+		BoneTransformData boneTransformData;
+		std::vector<Math::Matrix4> boneTransforms;
+		AnimationUtil::ComputeBoneTransforms(*renderObject.skeleton, boneTransforms,
+			[animator = renderObject.animator](const Bone* bone)
+		{
+			return animator->GetTransform(bone);
+		});
+		AnimationUtil::ApplyBoneOffset(*renderObject.skeleton, boneTransforms);
+
+		const size_t boneCount = renderObject.skeleton->bones.size();
+		for (size_t i = 0; i < boneCount && i < BoneTransformData::MaxBoneCount; ++i)
+		{
+			boneTransformData.boneTransforms[i] = Math::Transpose(boneTransforms[i]);
+
+		}
+		mBoneTransformBuffer.Update(boneTransformData);
+		settingsData.useSkinning = 1;
+
+	}
+	else if (renderObject.skeleton)
+	{
+		BoneTransformData boneTransformData;
+
+		std::vector<Math::Matrix4> boneTransforms;
+		AnimationUtil::ComputeBoneTransforms(*renderObject.skeleton, boneTransforms, [](const Bone* bone) {return bone->toParentTransform; });
+		AnimationUtil::ApplyBoneOffset(*renderObject.skeleton, boneTransforms);
+
+		const size_t boneCount = renderObject.skeleton->bones.size();
+		for (size_t i = 0; i < boneCount && i < BoneTransformData::MaxBoneCount; ++i)
+		{
+			boneTransformData.boneTransforms[i] = Math::Transpose(boneTransforms[i]);
+
+		}
+
+		mBoneTransformBuffer.Update(boneTransformData);
+		settingsData.useSkinning = 1;
+
+	}*/
+
+	mTransformBuffer.Update(transformData);
+	mLightBuffer.Update(*mDirectionalLight);
+	mMaterialBuffer.Update(renderObject.material);
+	mSettingsBuffer.Update(settingsData);
+
+	renderObject.diffuseMap.BindPS(0);
+	renderObject.specularMap.BindPS(1);
+	//renderObject.specularMap.BindPS(1);
+	//renderObject.displacementMap.BindVS(2);
+	//renderObject.normalMap.BindPS(3);
+	renderObject.meshBuffer.Render();
+}
+
+void TerrainEffect::SetCamera(const Camera& camera)
+{
+	mCamera = &camera;
+}
+
+void TerrainEffect::SetLightCamera(const Camera* camera)
+{
+	mLightCamera = camera;
+}
+
+void TerrainEffect::SetDirectionalLight(const DirectionalLight& directionalLight)
+{
+	mDirectionalLight = &directionalLight;
+}
+
+void TerrainEffect::SetShadowMap(const Texture* shadowMap)
+{
+	mShadowMap = shadowMap;
+}

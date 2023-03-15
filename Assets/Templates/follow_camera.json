@@ -1,0 +1,12 @@
+{
+	"Components": {
+		"CameraComponent": {
+		},
+		"FollowCameraControllerComponent": {
+			"Target": "Player",
+			"Distance": 40,
+			"CameraElevation": 20,
+			"LookElevation": 1
+		}
+	}
+}

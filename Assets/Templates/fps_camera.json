@@ -1,0 +1,9 @@
+{
+  "Components": {
+    "CameraComponent": {
+    },
+    "FPSCameraControllerComponent": {
+
+    }
+  }
+}

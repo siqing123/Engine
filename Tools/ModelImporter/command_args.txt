@@ -1,0 +1,2 @@
+-scale 0.01 ../../Assets/Models/Maria/maria.fbx ../../Assets/Models/Maria/maria.model
+-scale 0.01 ../../Assets/Models/Maria/Dancing.fbx ../../Assets/Models/Maria/Dancing.model

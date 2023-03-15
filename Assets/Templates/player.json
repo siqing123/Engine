@@ -1,0 +1,29 @@
+{
+	"Components": {
+		"TransformComponent": {
+			"Position": [ 0, 0, 0 ],
+			"Rotation": [ 0, 0, 0 ],
+			"Scale": [ 1, 1, 1 ]
+		},
+		"ColliderComponent": {
+			"Center": [ 0, 1, 0 ],
+			"Extend": [ 0.5, 2, 0.5 ]
+		},
+		"ModelComponent": {
+			"FileName": "../../Assets/Models/Ortiz/duck.model",
+			"Rotation": [ 0, 180, 0 ]
+		},
+		"AnimatorComponent": {
+			"AnimSets": [
+				"../../Assets/Models/Ortiz/idle.animation",
+				"../../Assets/Models/Ortiz/run.animation",
+				"../../Assets/Models/Ortiz/ninjaRun.animation"
+			]
+		},
+		"PlayerControllerComponent": {
+			"WalkSpeed": 10,
+			"RunSpeed": 100
+		}
+	}
+}
+

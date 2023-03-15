@@ -1,0 +1,70 @@
+{
+	"Capacity": 1000,
+	"Services": {
+		"CameraService": {
+		},
+		"RenderService": {
+			"SkydomeTexture": "../../Assets/Images/skydome_skies.jpg"
+		},
+		"TerrainService": {
+			"HeightMap": "../../Assets/Heightmaps/heightmap_512x512.raw",
+			"MaxHeight": 18,
+			"Textures": [
+				"../../Assets/Images/grass_2048.jpg",
+				"../../Assets/Images/dirt_seamless.jpg"
+			]
+		}
+	},
+	"GameObjects": [
+		{
+			"Name": "Player",
+			"TemplateFile": "../../Assets/Templates/player.json",
+			"Components": {
+				"TransformComponent": {
+					"Position": [ 100, 0, 100 ]
+				}
+			}
+		},
+		{
+			"Name": "FollowCamera",
+			"TemplateFile": "../../Assets/Templates/follow_camera.json"
+		},
+		{
+			"Name": "SpawnerA",
+			"TemplateFile": "../../Assets/Templates/spawner.json",
+			"Components": {
+				"TransformComponent": {
+					"Position": [ 100, 0, 150 ]
+				}
+			}
+		},
+		{
+			"Name": "SpawnerB",
+			"TemplateFile": "../../Assets/Templates/spawner.json",
+			"Components": {
+				"TransformComponent": {
+					"Position": [ 120, 0, 120 ]
+				}
+			}
+		},
+		{
+			"Name": "SpawnerC",
+			"TemplateFile": "../../Assets/Templates/spawner.json",
+			"Components": {
+				"TransformComponent": {
+					"Position": [ 150, 0, 130 ]
+				}
+			}
+		},
+		{
+			"Name": "SpawnerD",
+			"TemplateFile": "../../Assets/Templates/spawner.json",
+			"Components": {
+				"TransformComponent": {
+					"Position": [ 180, 0, 100 ]
+				}
+			}
+		}
+	]
+}
+

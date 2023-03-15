@@ -1,0 +1,16 @@
+{
+  "Components": {
+    "TransformComponent": {
+      "Position": [ 3, 2, 0 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 1, 1, 1 ]
+    },
+    "ColliderComponent": {
+      "Center": [ 0, 0, 0 ],
+      "Extend": [ 0.5, 2, 0.5 ]
+    },
+    "ModelComponent": {
+      "FileName": "../../Assets/Models/Jumping.model"
+    }
+  }
+}
